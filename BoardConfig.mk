@@ -7,10 +7,10 @@
 
 LOCAL_PATH := device/huawei/y6b
 
-# Allow building with incomplete sources (common for recovery-only trees)
+# Allow building with incomplete sources
 ALLOW_MISSING_DEPENDENCIES := true
 
-# Architecture (64-bit kernel is standard on MT6765 even if vendor is 32-bit)
+# Architecture – 64-bit primary (correct for most MT6765 devices)
 TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-a
 TARGET_CPU_ABI := arm64-v8a
@@ -34,7 +34,7 @@ TARGET_NO_RADIOIMAGE := true
 TARGET_BOARD_PLATFORM := mt6765
 TARGET_BOARD_PLATFORM_GPU := mali-g52
 
-# Kernel / Boot image (from your recovery.img extraction)
+# Kernel / Boot image
 TARGET_PREBUILT_KERNEL := $(LOCAL_PATH)/prebuilt/kernel
 TARGET_PREBUILT_DTB := $(LOCAL_PATH)/prebuilt/dtb.img
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
@@ -46,12 +46,13 @@ BOARD_KERNEL_PAGESIZE := 2048
 BOARD_RAMDISK_OFFSET := 0x11a88000
 BOARD_KERNEL_TAGS_OFFSET := 0x07808000
 
-# Most MT6765 devices use this cmdline – permissive helps TWRP boot without SELinux issues
 BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive
 
-BOARD_KERNEL_IMAGE_NAME := Image   # change to Image.gz if your prebuilt is gzipped
+BOARD_KERNEL_IMAGE_NAME := Image
+# If your prebuilt kernel is gzipped → change to: Image.gz
+# BOARD_KERNEL_IMAGE_NAME := Image.gz
 
-# Partitions (from your recovery.img – ~45 MB)
+# Partitions (≈45 MB from your recovery.img)
 BOARD_FLASH_BLOCK_SIZE := 131072
 BOARD_BOOTIMAGE_PARTITION_SIZE := 47185920
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 47185920
@@ -60,55 +61,56 @@ BOARD_RECOVERYIMAGE_PARTITION_SIZE := 47185920
 BOARD_HAS_LARGE_FILESYSTEM := true
 BOARD_SYSTEMIMAGE_PARTITION_TYPE := ext4
 BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
-BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs   # matches your fstab /data
+BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 TARGET_COPY_OUT_VENDOR := vendor
 
-# Use metadata partition (required for FBE decryption)
+# Metadata partition (required for FBE decryption)
 BOARD_USES_METADATA_PARTITION := true
 
-# TWRP theme & basic flags
+# TWRP basic flags
 TW_THEME := portrait_hdpi
 TW_EXTRA_LANGUAGES := true
 TW_SCREEN_BLANK_ON_BOOT := true
 TW_INPUT_BLACKLIST := "hbtp_vm"
 TW_USE_TOOLBOX := true
 
-# Brightness control (common paths on MTK – adjust later if needed)
+# Brightness (common MTK path – change later if wrong)
 TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
 TW_MAX_BRIGHTNESS := 2047
 TW_DEFAULT_BRIGHTNESS := 1024
 
-# Crypto / Decryption (critical for your fstab → FBEv2 + metadata)
+# Crypto / Decryption (FBEv2 + metadata – very important for Android 10/11)
 TW_INCLUDE_CRYPTO := true
 TW_INCLUDE_CRYPTO_FBE := true
 TW_INCLUDE_FBE_METADATA_DECRYPT := true
 TW_USE_FSCRYPT_POLICY := true
 TW_NO_LEGACY_PROPS := true
 
-# Internal storage fix (very common on Huawei/MTK – shows /data/media as /sdcard)
+# Internal storage fix (Huawei/MTK classic – shows /data/media/0 as /sdcard)
 RECOVERY_SDCARD_ON_DATA := true
 
-# MTP & ADB improvements
+# MTP & ADB
 TW_EXCLUDE_DEFAULT_USB_INIT := true
 TW_USE_NEW_MINADBD := true
 TW_HAS_MTP := true
 
-# Other common TWRP fixes for MTK/Huawei
+# Other MTK/Huawei fixes
 TW_FORCE_USE_SYSTEM_FSTAB := true
 TARGET_RECOVERY_PIXEL_FORMAT := "RGBX_8888"
 BOARD_HAS_NO_SELECT_BUTTON := true
 TW_NO_SCREEN_BLANK := false
-TW_LOAD_VENDOR_MODULES := "novatek_ts_i2c"   # example touchscreen – add yours if needed after test boot
 
-# Anti-rollback / build hack (prevents rejection on older bootloader)
+# Touchscreen modules – load several common MTK drivers
+# You can narrow it down after first boot + recovery.log check
+TW_LOAD_VENDOR_MODULES := "goodix_ts fts_ts ili_tek novatek_ts_i2c focaltech_ts"
+
+# Anti-rollback bypass
 PLATFORM_SECURITY_PATCH := 2099-12-31
 VENDOR_SECURITY_PATCH := 2099-12-31
-PLATFORM_VERSION := 11.0   # or 12.0 – match or go slightly higher than stock
+PLATFORM_VERSION := 11.0   # or 10.0 / 12.0 – try matching your stock Android version
 
-# Optional – reduces recovery size & suppresses warnings
+# Build optimizations
 PRODUCT_NO_DEBUG_BUILD := true
 TARGET_RECOVERY_FORCE_FLASH_REPACK := true
-#touch
-TW_LOAD_VENDOR_MODULES := "goodix_ts fts_ts ili_tek novatek_ts_i2c"
