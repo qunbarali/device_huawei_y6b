@@ -29,7 +29,7 @@ TARGET_BOARD_PLATFORM_GPU := mali-g52
 
 # Kernel (prebuilt)
 TARGET_PREBUILT_KERNEL := $(LOCAL_PATH)/prebuilt/kernel
-TARGET_PREBUILT_DTB := $(LOCAL_PATH)/prebuilt/dtb.img
+TARGET_PREBUILT_DTB := $(LOCAL_PATH)/prebuilt/dtbo.img
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
 TARGET_FORCE_PREBUILT_KERNEL := true
 
@@ -40,7 +40,7 @@ BOARD_RAMDISK_OFFSET := 0x11a88000
 BOARD_KERNEL_TAGS_OFFSET := 0x07808000
 
 BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 androidboot.selinux=permissive
-BOARD_KERNEL_IMAGE_NAME := Image  # Change to Image.gz if gzipped
+BOARD_KERNEL_IMAGE_NAME := Image.gz   # ← most MT6765 kernels are gzipped
 
 # Partitions
 BOARD_FLASH_BLOCK_SIZE := 131072
